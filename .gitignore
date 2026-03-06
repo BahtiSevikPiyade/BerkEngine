@@ -1,0 +1,16 @@
+# Derleme Dosyaları
+bin/
+bin-int/
+
+# IDE Dosyaları
+.vscode/
+.vs/
+*.user
+*.suo
+
+# Geçici Dosyalar
+*.exe
+*.pdb
+*.obj
+*.lib
+*.dll
