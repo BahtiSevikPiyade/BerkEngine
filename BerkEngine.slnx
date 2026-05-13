@@ -7,6 +7,8 @@
   </Configurations>
   <Project Path="BerkEngine\BerkEngine.vcxproj" Id="1FD35C40-0B8B-9E8D-7492-77E96069397E">
   </Project>
+  <Project Path="BerkEngine\vendor\GLFW\GLFW.vcxproj" Id="154B857C-0182-860D-AA6E-6C109684020F">
+  </Project>
   <Project Path="Sandbox\Sandbox.vcxproj" Id="F4C124E3-60A1-A37E-69B9-2E55D5170AE0" DefaultStartup="true">
   </Project>
 </Solution>

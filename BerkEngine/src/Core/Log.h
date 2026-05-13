@@ -24,3 +24,10 @@ namespace BerkEngine {
 // Uygulama (Sandbox) için log makroları
 #define BE_ERROR(...)      ::BerkEngine::Log::GetClientLogger()->error(__VA_ARGS__)
 #define BE_INFO(...)       ::BerkEngine::Log::GetClientLogger()->info(__VA_ARGS__)
+
+// Assert makrosu
+#ifdef BE_DEBUG
+    #define BE_ASSERT(x, msg) { if(!(x)) { BE_CORE_ERROR("ASSERT FAILED: {}", msg); __debugbreak(); } }
+#else
+    #define BE_ASSERT(x, msg)
+#endif
