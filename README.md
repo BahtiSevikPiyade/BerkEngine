@@ -20,6 +20,9 @@ ECS (Entity Component System), oyun nesnelerini üç ayrı kavrama bölerek yük
 - `BerkEngine::ComponentManager` — Tüm bileşen dizilerini yönetir.
 - `BerkEngine::System` — Kullanıcı tanımlı sistemlerin türediği temel sınıf.
 - `BerkEngine::SystemManager` — Sistemleri kaydeder ve entity üyeliğini günceller.
+- `BerkEngine::Timer` — Frame delta/fixed timestep ve lag kontrolü sağlar.
+- `BerkEngine::Application` — Uygulama yaşam döngüsü callback yüzeyi sağlar.
+- `BerkEngine::Engine` — Standart frame pipeline döngüsünü (`Poll Events -> Fixed Update -> Variable Update -> Render`) yürütür.
 
 ## Gereksinimler
 

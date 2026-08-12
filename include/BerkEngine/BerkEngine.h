@@ -8,3 +8,6 @@
 #include "System.h"
 #include "SystemManager.h"
 #include "World.h"
+#include "Timer.h"
+#include "Application.h"
+#include "Engine.h"
