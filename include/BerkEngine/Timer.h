@@ -32,8 +32,11 @@ public:
         const auto now = Clock::now();
         const std::chrono::duration<double> dt = now - mLastTick;
         mLastTick = now;
+        return beginFrame(dt.count());
+    }
 
-        mRawDeltaSeconds = dt.count();
+    FrameSample beginFrame(double rawDeltaSeconds) {
+        mRawDeltaSeconds = rawDeltaSeconds;
         mDeltaSeconds = std::min(mRawDeltaSeconds, mConfig.maxFrameDeltaSeconds);
         mAccumulatorSeconds += mDeltaSeconds;
 

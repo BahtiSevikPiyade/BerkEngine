@@ -23,6 +23,28 @@ ECS (Entity Component System), oyun nesnelerini üç ayrı kavrama bölerek yük
 - `BerkEngine::Timer` — Frame delta/fixed timestep ve lag kontrolü sağlar.
 - `BerkEngine::Application` — Uygulama yaşam döngüsü callback yüzeyi sağlar.
 - `BerkEngine::Engine` — Standart frame pipeline döngüsünü (`Poll Events -> Fixed Update -> Variable Update -> Render`) yürütür.
+- `BerkEngine::Event` / `BerkEngine::EventQueue` — Input/platform olaylarını frame bazlı kuyruklar.
+- `BerkEngine::Scene` — Sahne yaşam döngüsü ve update/render delegasyon sınırını tanımlar.
+- `BerkEngine::IRenderer` — Render backend soyutlama arayüzüdür.
+
+## Runtime Pipeline Standardı
+
+Engine her frame aşağıdaki sırayla çalışır:
+
+1. `Poll Events`
+2. `Fixed Update`
+3. `Variable Update`
+4. `Render`
+
+Event kuyruğu frame başında doldurulur, update/render fazlarında tüketilebilir ve frame sonunda temizlenir.
+
+## Zaman Politikası
+
+- `rawDeltaTime`: gerçek frame süresi
+- `deltaTime`: `maxFrameDelta` ile clamp edilmiş süre
+- `fixedTimeStep`: accumulator tabanlı sabit adım
+- `maxFixedUpdatesPerFrame`: bir frame'de işlenecek sabit adım üst limiti
+- Limit aşılırsa birikmiş lag düşürülür (`dropAccumulatedLag`) ve sonraki frame'e taşınmaz.
 
 ## Gereksinimler
 
@@ -109,8 +131,16 @@ BerkEngine/
 │       ├── ComponentManager.h  # Tüm bileşen dizilerinin yöneticisi
 │       ├── System.h            # Sistem temel sınıfı
 │       ├── SystemManager.h     # Sistem yöneticisi
-│       └── World.h             # Merkezi koordinatör
+│       ├── World.h             # Merkezi koordinatör
+│       ├── Event.h             # Temel event tipi
+│       ├── EventQueue.h        # Frame event kuyruğu
+│       ├── Timer.h             # Delta/fixed timestep yönetimi
+│       ├── Renderer.h          # Render soyut arayüzü
+│       ├── Scene.h             # Sahne arayüzü
+│       ├── Application.h       # App yaşam döngüsü + scene yönetimi
+│       └── Engine.h            # Runtime döngü orkestrasyonu
 └── tests/
     ├── CMakeLists.txt
-    └── test_ecs.cpp            # 15 birim testi
+    ├── test_ecs.cpp            # ECS birim testleri
+    └── test_runtime.cpp        # Runtime pipeline testleri
 ```

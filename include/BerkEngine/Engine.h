@@ -25,25 +25,27 @@ public:
 
     void run(Application& app) {
         mRunning = true;
+        if (app.renderer() != nullptr) {
+            app.renderer()->initialize();
+        }
 
         while (mRunning && app.isRunning()) {
-            app.onPollEvents();
-
-            mTimer.beginFrame();
-
-            std::uint32_t fixedSteps = 0;
-            while (mTimer.consumeFixedStep() && fixedSteps < mConfig.maxFixedUpdatesPerFrame) {
-                app.onFixedUpdate(app.world(), mTimer.fixedTimeStepSeconds());
-                ++fixedSteps;
-            }
-
-            if (fixedSteps == mConfig.maxFixedUpdatesPerFrame) {
-                mTimer.dropAccumulatedLag();
-            }
-
-            app.onVariableUpdate(app.world(), mTimer.deltaSeconds());
-            app.onRender(app.world(), mTimer.interpolationAlpha());
+            runSingleFrame(app);
         }
+
+        if (app.renderer() != nullptr) {
+            app.renderer()->shutdown();
+        }
+    }
+
+    void runSingleFrame(Application& app) {
+        mTimer.beginFrame();
+        runSingleFrameWithPreparedTimer(app);
+    }
+
+    void runSingleFrame(Application& app, double rawDeltaSeconds) {
+        mTimer.beginFrame(rawDeltaSeconds);
+        runSingleFrameWithPreparedTimer(app);
     }
 
     void stop() {
@@ -55,6 +57,24 @@ public:
     }
 
 private:
+    void runSingleFrameWithPreparedTimer(Application& app) {
+        app.onPollEvents(app.events());
+
+        std::uint32_t fixedSteps = 0;
+        while (mTimer.consumeFixedStep() && fixedSteps < mConfig.maxFixedUpdatesPerFrame) {
+            app.onFixedUpdate(app.world(), mTimer.fixedTimeStepSeconds());
+            ++fixedSteps;
+        }
+
+        if (fixedSteps == mConfig.maxFixedUpdatesPerFrame) {
+            mTimer.dropAccumulatedLag();
+        }
+
+        app.onVariableUpdate(app.world(), mTimer.deltaSeconds());
+        app.onRender(app.world(), mTimer.interpolationAlpha());
+        app.clearFrameEvents();
+    }
+
     Config mConfig{};
     Timer mTimer{};
     bool mRunning{false};
