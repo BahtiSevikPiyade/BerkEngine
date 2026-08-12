@@ -1,6 +1,8 @@
 #pragma once
 
+#include "AssetManager.h"
 #include "EventQueue.h"
+#include "Platform.h"
 #include "Renderer.h"
 #include "Scene.h"
 #include "World.h"
@@ -94,6 +96,22 @@ public:
         return mRenderer;
     }
 
+    void setPlatform(IPlatform* platform) {
+        mPlatform = platform;
+    }
+
+    IPlatform* platform() const {
+        return mPlatform;
+    }
+
+    AssetManager& assets() {
+        return mAssets;
+    }
+
+    const AssetManager& assets() const {
+        return mAssets;
+    }
+
     void setScene(std::shared_ptr<Scene> nextScene) {
         if (mActiveScene) {
             mActiveScene->onExit(*this);
@@ -111,6 +129,8 @@ public:
 private:
     World mWorld{};
     EventQueue mEvents{};
+    AssetManager mAssets{};
+    IPlatform* mPlatform{nullptr};
     IRenderer* mRenderer{nullptr};
     std::shared_ptr<Scene> mActiveScene{};
     bool mRunning{true};

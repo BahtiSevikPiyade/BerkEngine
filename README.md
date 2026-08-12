@@ -24,8 +24,11 @@ ECS (Entity Component System), oyun nesnelerini üç ayrı kavrama bölerek yük
 - `BerkEngine::Application` — Uygulama yaşam döngüsü callback yüzeyi sağlar.
 - `BerkEngine::Engine` — Standart frame pipeline döngüsünü (`Poll Events -> Fixed Update -> Variable Update -> Render`) yürütür.
 - `BerkEngine::Event` / `BerkEngine::EventQueue` — Input/platform olaylarını frame bazlı kuyruklar.
+- `BerkEngine::IPlatform` — Platform/pencere/input katmanı soyutlama arayüzüdür.
 - `BerkEngine::Scene` — Sahne yaşam döngüsü ve update/render delegasyon sınırını tanımlar.
 - `BerkEngine::IRenderer` — Render backend soyutlama arayüzüdür.
+- `BerkEngine::HeadlessRenderer` — Görselleştirme gerektirmeyen çalıştırmalar için varsayılan backend uygulamasıdır.
+- `BerkEngine::AssetManager` — Runtime’da temel texture metadata kayıt/sorgu API’si sağlar.
 
 ## Runtime Pipeline Standardı
 
@@ -134,8 +137,12 @@ BerkEngine/
 │       ├── World.h             # Merkezi koordinatör
 │       ├── Event.h             # Temel event tipi
 │       ├── EventQueue.h        # Frame event kuyruğu
+│       ├── Platform.h          # Platform soyutlama arayüzü
 │       ├── Timer.h             # Delta/fixed timestep yönetimi
+│       ├── Asset.h             # Asset veri tipleri
+│       ├── AssetManager.h      # Asset kayıt/sorgu yöneticisi
 │       ├── Renderer.h          # Render soyut arayüzü
+│       ├── HeadlessRenderer.h  # Basit backend implementasyonu
 │       ├── Scene.h             # Sahne arayüzü
 │       ├── Application.h       # App yaşam döngüsü + scene yönetimi
 │       └── Engine.h            # Runtime döngü orkestrasyonu

@@ -6,6 +6,22 @@
 #include <string>
 #include <vector>
 
+class FakePlatform : public BerkEngine::IPlatform {
+public:
+    void initialize() override { ++initializeCount; }
+    void pollEvents(BerkEngine::EventQueue& events) override {
+        ++pollCount;
+        events.push(BerkEngine::Event{BerkEngine::EventType::WindowResized, false});
+    }
+    bool shouldClose() const override { return closeRequested; }
+    void shutdown() override { ++shutdownCount; }
+
+    int initializeCount{0};
+    int pollCount{0};
+    int shutdownCount{0};
+    bool closeRequested{false};
+};
+
 class CountingRenderer : public BerkEngine::IRenderer {
 public:
     void initialize() override { ++initializeCount; }
@@ -113,6 +129,57 @@ static void testLagDropRule() {
     assert(app.renderAlpha == 0.0);
 }
 
+static void testPlatformIntegrationAndQuit() {
+    BerkEngine::Engine engine;
+    RuntimeApplication app;
+    FakePlatform platform;
+    app.setPlatform(&platform);
+
+    engine.runSingleFrame(app, 0.016);
+    assert(platform.pollCount == 1);
+    assert(app.isRunning() == true);
+
+    platform.closeRequested = true;
+    engine.runSingleFrame(app, 0.016);
+    assert(platform.pollCount == 2);
+    assert(app.isRunning() == false);
+}
+
+static void testAssetManagerBasics() {
+    RuntimeApplication app;
+
+    const bool firstInsert = app.assets().registerTexture(
+        BerkEngine::TextureAsset{"hero_idle", "assets/hero_idle.png", 64, 64});
+    assert(firstInsert == true);
+    assert(app.assets().hasTexture("hero_idle") == true);
+
+    const bool secondInsert = app.assets().registerTexture(
+        BerkEngine::TextureAsset{"hero_idle", "assets/hero_idle_v2.png", 128, 128});
+    assert(secondInsert == false);
+
+    const auto* texture = app.assets().findTexture("hero_idle");
+    assert(texture != nullptr);
+    assert(texture->sourcePath == "assets/hero_idle_v2.png");
+    assert(texture->width == 128);
+    assert(texture->height == 128);
+}
+
+static void testHeadlessRenderer() {
+    BerkEngine::HeadlessRenderer renderer;
+    BerkEngine::World world;
+
+    renderer.initialize();
+    assert(renderer.isInitialized() == true);
+    renderer.beginFrame();
+    renderer.draw(world, 0.5);
+    renderer.endFrame();
+
+    assert(renderer.frameCount() == 1);
+    assert(renderer.lastInterpolationAlpha() == 0.5);
+    renderer.shutdown();
+    assert(renderer.isInitialized() == false);
+}
+
 static void testSceneLifecycle() {
     RuntimeApplication app;
     auto sceneA = std::make_shared<TrackingScene>();
@@ -131,6 +198,9 @@ int main() {
     std::cout << "BerkEngine Runtime Tests\n";
     testLifecycleAndTiming();
     testLagDropRule();
+    testPlatformIntegrationAndQuit();
+    testAssetManagerBasics();
+    testHeadlessRenderer();
     testSceneLifecycle();
     std::cout << "All runtime tests passed\n";
     return 0;

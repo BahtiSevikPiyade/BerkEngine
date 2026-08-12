@@ -25,6 +25,9 @@ public:
 
     void run(Application& app) {
         mRunning = true;
+        if (app.platform() != nullptr) {
+            app.platform()->initialize();
+        }
         if (app.renderer() != nullptr) {
             app.renderer()->initialize();
         }
@@ -35,6 +38,9 @@ public:
 
         if (app.renderer() != nullptr) {
             app.renderer()->shutdown();
+        }
+        if (app.platform() != nullptr) {
+            app.platform()->shutdown();
         }
     }
 
@@ -58,6 +64,14 @@ public:
 
 private:
     void runSingleFrameWithPreparedTimer(Application& app) {
+        if (app.platform() != nullptr) {
+            app.platform()->pollEvents(app.events());
+            if (app.platform()->shouldClose()) {
+                app.pushEvent(Event{EventType::Quit, false});
+                app.requestQuit();
+            }
+        }
+
         app.onPollEvents(app.events());
 
         std::uint32_t fixedSteps = 0;
