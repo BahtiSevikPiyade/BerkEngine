@@ -1,5 +1,7 @@
 #pragma once
 
+#include "AssetManager.h"
+#include "RenderTypes.h"
 #include "World.h"
 
 namespace BerkEngine {
@@ -10,7 +12,12 @@ public:
 
     virtual void initialize() {}
     virtual void beginFrame() {}
-    virtual void draw(World& /*world*/, double /*interpolationAlpha*/) {}
+    virtual void draw(
+        World& /*world*/,
+        const RenderQueue& /*queue*/,
+        AssetManager& /*assets*/,
+        double /*interpolationAlpha*/
+    ) {}
     virtual void endFrame() {}
     virtual void shutdown() {}
 };
