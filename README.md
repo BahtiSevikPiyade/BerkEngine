@@ -25,10 +25,11 @@ ECS (Entity Component System), oyun nesnelerini üç ayrı kavrama bölerek yük
 - `BerkEngine::Engine` — Standart frame pipeline döngüsünü (`Poll Events -> Fixed Update -> Variable Update -> Render`) yürütür.
 - `BerkEngine::Event` / `BerkEngine::EventQueue` — Input/platform olaylarını frame bazlı kuyruklar.
 - `BerkEngine::IPlatform` — Platform/pencere/input katmanı soyutlama arayüzüdür.
+- `BerkEngine::SDLPlatform` — SDL2 mevcutsa pencere/input olaylarını `EventQueue` ile bütünleştiren platform backend’idir.
 - `BerkEngine::Scene` — Sahne yaşam döngüsü ve update/render delegasyon sınırını tanımlar.
 - `BerkEngine::IRenderer` — Render backend soyutlama arayüzüdür.
 - `BerkEngine::HeadlessRenderer` — Görselleştirme gerektirmeyen çalıştırmalar için varsayılan backend uygulamasıdır.
-- `BerkEngine::AssetManager` — Runtime’da temel texture metadata kayıt/sorgu API’si sağlar.
+- `BerkEngine::AssetManager` — Runtime’da temel texture metadata kayıt/sorgu API’si ve dosyadan manifest yükleme sağlar.
 
 ## Runtime Pipeline Standardı
 
@@ -66,6 +67,18 @@ cmake --build build
 ```bash
 ctest --test-dir build --output-on-failure
 ```
+
+## Texture Manifest Yükleme (Aşama 1)
+
+`AssetManager::loadTextureManifest(path)` aşağıdaki boşluk-ayrılmış formatı destekler:
+
+```txt
+# name sourcePath width height
+hero_idle assets/hero_idle.png 64 64
+hero_run assets/hero_run.png 128 64
+```
+
+Yorum satırları (`#`) ve boş satırlar yok sayılır.
 
 ## Kullanım Örneği
 
@@ -138,6 +151,7 @@ BerkEngine/
 │       ├── Event.h             # Temel event tipi
 │       ├── EventQueue.h        # Frame event kuyruğu
 │       ├── Platform.h          # Platform soyutlama arayüzü
+│       ├── SDLPlatform.h       # SDL2 tabanlı platform backend (opsiyonel)
 │       ├── Timer.h             # Delta/fixed timestep yönetimi
 │       ├── Asset.h             # Asset veri tipleri
 │       ├── AssetManager.h      # Asset kayıt/sorgu yöneticisi

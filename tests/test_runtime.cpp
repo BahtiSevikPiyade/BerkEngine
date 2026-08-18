@@ -1,6 +1,8 @@
 #include <BerkEngine/BerkEngine.h>
 
 #include <cassert>
+#include <cstdio>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -164,6 +166,48 @@ static void testAssetManagerBasics() {
     assert(texture->height == 128);
 }
 
+static void testAssetManifestLoading() {
+    RuntimeApplication app;
+
+    const std::string manifestPath = "/tmp/berkengine_texture_manifest.txt";
+    {
+        std::ofstream out(manifestPath);
+        out << "# name path width height\n";
+        out << "hero_idle assets/hero_idle.png 64 64\n";
+        out << "hero_run assets/hero_run.png 128 64\n";
+    }
+
+    const bool loaded = app.assets().loadTextureManifest(manifestPath);
+    assert(loaded == true);
+
+    const auto* heroIdle = app.assets().findTexture("hero_idle");
+    assert(heroIdle != nullptr);
+    assert(heroIdle->width == 64);
+    assert(heroIdle->height == 64);
+
+    const auto* heroRun = app.assets().findTexture("hero_run");
+    assert(heroRun != nullptr);
+    assert(heroRun->sourcePath == "assets/hero_run.png");
+
+    std::remove(manifestPath.c_str());
+}
+
+static void testAssetManifestLoadingRejectsMalformedInput() {
+    RuntimeApplication app;
+
+    const std::string manifestPath = "/tmp/berkengine_texture_manifest_invalid.txt";
+    {
+        std::ofstream out(manifestPath);
+        out << "missing_columns_only_name\n";
+    }
+
+    const bool loaded = app.assets().loadTextureManifest(manifestPath);
+    assert(loaded == false);
+    assert(app.assets().hasTexture("missing_columns_only_name") == false);
+
+    std::remove(manifestPath.c_str());
+}
+
 static void testHeadlessRenderer() {
     BerkEngine::HeadlessRenderer renderer;
     BerkEngine::World world;
@@ -178,6 +222,12 @@ static void testHeadlessRenderer() {
     assert(renderer.lastInterpolationAlpha() == 0.5);
     renderer.shutdown();
     assert(renderer.isInitialized() == false);
+}
+
+static void testSDLPlatformCompileTimeAvailability() {
+    BerkEngine::SDLPlatform platform;
+    assert(platform.isInitialized() == false);
+    platform.shutdown();
 }
 
 static void testSceneLifecycle() {
@@ -200,7 +250,10 @@ int main() {
     testLagDropRule();
     testPlatformIntegrationAndQuit();
     testAssetManagerBasics();
+    testAssetManifestLoading();
+    testAssetManifestLoadingRejectsMalformedInput();
     testHeadlessRenderer();
+    testSDLPlatformCompileTimeAvailability();
     testSceneLifecycle();
     std::cout << "All runtime tests passed\n";
     return 0;

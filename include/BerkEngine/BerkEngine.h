@@ -11,6 +11,7 @@
 #include "Event.h"
 #include "EventQueue.h"
 #include "Platform.h"
+#include "SDLPlatform.h"
 #include "Timer.h"
 #include "Asset.h"
 #include "AssetManager.h"
